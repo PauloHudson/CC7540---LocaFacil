@@ -126,6 +126,12 @@ body.menu-open {
   background-color: rgba(255, 255, 255, 0.3);
 }
 
+.nav-button-desktop {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .main-content {
   flex: 1;
   max-width: 1200px;
@@ -309,6 +315,10 @@ body.menu-open {
     border: none;
     transition: all 0.2s ease;
     cursor: pointer;
+  }
+
+  .nav-button-desktop {
+    display: none;
   }
 
   .nav-button:hover {
