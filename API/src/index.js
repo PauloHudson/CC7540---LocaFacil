@@ -5,7 +5,9 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth');
 const vehicleRoutes = require('./routes/vehicles');
 const electronicRoutes = require('./routes/electronics');
-
+const rentalRoutes = require('./routes/rentals');
+const insuranceRoutes = require('./routes/insurance');
+const userRoutes = require('./routes/users');
 
 const app = express();
 
@@ -23,11 +25,13 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/electronics', electronicRoutes);
-
+app.use('/api/rentals', rentalRoutes);
+app.use('/api/insurance', insuranceRoutes);
+app.use('/api/users', userRoutes);
 
 // 404
 app.use((req, res) => {
-  res.status(404).json({ error: 'Api ta rodando lindo' });
+  res.status(404).json({ error: 'Api ta rodando kkkkk' });
 });
 
 // Error handling

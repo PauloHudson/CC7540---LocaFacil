@@ -90,10 +90,6 @@ const Layout = ({ children }) => {
                   </NavLink>
                 </>
               )}
-              <button onClick={handleLogout} className="nav-button nav-button-desktop" type="button">
-                <FontAwesomeIcon icon={faArrowRightFromBracket} />
-                <span>Sair</span>
-              </button>
             </div>
             <div className="nav-footer">
               <button onClick={handleLogout} className="nav-button">
