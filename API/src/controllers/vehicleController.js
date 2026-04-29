@@ -37,7 +37,8 @@ const vehicleController = {
 
   async create(req, res) {
     try {
-      const { name, brand, model, year, color, license_plate, daily_price } = req.body;
+      const { name, brand, model, year, color, license_plate, daily_price, image_urls } = req.body;
+      console.log('Debug: vehicle.create received image_urls ->', image_urls);
 
       if (!name || !brand || !model || !year || !daily_price) {
         return res.status(400).json({ error: 'Campos faltando' });
@@ -50,7 +51,8 @@ const vehicleController = {
         year,
         color,
         license_plate,
-        daily_price
+        daily_price,
+        image_urls
       });
 
       res.status(201).json({
@@ -66,7 +68,7 @@ const vehicleController = {
   async update(req, res) {
     try {
       const { id } = req.params;
-      const { name, brand, model, year, color, license_plate, daily_price, status } = req.body;
+      const { name, brand, model, year, color, license_plate, daily_price, status, image_urls } = req.body;
 
       const vehicle = await VehicleModel.update(id, {
         name: name || undefined,
@@ -76,7 +78,8 @@ const vehicleController = {
         color: color || undefined,
         license_plate: license_plate || undefined,
         daily_price: daily_price || undefined,
-        status: status || undefined
+        status: status || undefined,
+        image_urls: image_urls || undefined
       });
 
       res.json({

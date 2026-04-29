@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { vehicleService } from '../services/api';
+import ProductPhotoCarousel from '../components/ProductPhotoCarousel';
+import PLACEHOLDER_DATA_URI from '../utils/placeholder';
 import './AdminScreens.css';
 
 const AdminVehiclesScreen = () => {
@@ -13,6 +15,7 @@ const AdminVehiclesScreen = () => {
     color: '',
     license_plate: '',
     daily_price: '',
+    image_urls: '',
   });
   const [showForm, setShowForm] = useState(false);
 
@@ -35,7 +38,13 @@ const AdminVehiclesScreen = () => {
   const handleAddVehicle = async (e) => {
     e.preventDefault();
     try {
-      await vehicleService.create(newVehicle);
+      // parse image_urls textarea into an array before sending
+      const payload = {
+        ...newVehicle,
+        image_urls: parseImageUrls(newVehicle.image_urls),
+      };
+      console.log('[AdminVehiclesScreen] Sending payload:', payload);
+      await vehicleService.create(payload);
       setNewVehicle({
         name: '',
         brand: '',
@@ -44,6 +53,7 @@ const AdminVehiclesScreen = () => {
         color: '',
         license_plate: '',
         daily_price: '',
+        image_urls: '',
       });
       setShowForm(false);
       loadVehicles();
@@ -51,6 +61,18 @@ const AdminVehiclesScreen = () => {
       console.error('Erro ao adicionar:', err);
     }
   };
+
+  const parseImageUrls = (imageUrls) => {
+    if (!imageUrls) return null;
+    const result = String(imageUrls)
+      .split(/[,\n]/)
+      .map((u) => u.trim())
+      .filter(Boolean);
+    console.log('[parseImageUrls Vehicle] Input:', imageUrls, '| Output:', result);
+    return result.length > 0 ? result : null;
+  };
+
+  const previewImages = parseImageUrls(newVehicle.image_urls) || [];
 
   if (loading) {
     return <div className="admin-container"><div className="loading">Carregando...</div></div>;
@@ -146,33 +168,61 @@ const AdminVehiclesScreen = () => {
             />
           </div>
 
+          <div className="form-group">
+            <label>Fotos do veículo (URLs separadas por vírgula ou uma por linha)</label>
+            <textarea
+              value={newVehicle.image_urls}
+              onChange={(e) => setNewVehicle({ ...newVehicle, image_urls: e.target.value })}
+              className="form-textarea"
+              placeholder="https://...\nhttps://..."
+              rows="3"
+            />
+            {previewImages.length > 0 && (
+              <div className="image-preview-grid">
+                {previewImages.map((src, idx) => (
+                  <div key={src + idx} className="image-preview-item">
+                    <img
+                      src={src}
+                      alt={`Preview ${idx + 1}`}
+                      onError={(e) => { e.currentTarget.src = PLACEHOLDER_DATA_URI; }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <button type="submit" className="btn-submit">Adicionar Veículo</button>
         </form>
       )}
 
-      <div className="admin-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Marca</th>
-              <th>Modelo</th>
-              <th>Placa</th>
-              <th>Preço/dia</th>
-            </tr>
-          </thead>
-          <tbody>
-            {vehicles.map(vehicle => (
-              <tr key={vehicle.id}>
-                <td>{vehicle.name}</td>
-                <td>{vehicle.brand}</td>
-                <td>{vehicle.model}</td>
-                <td>{vehicle.license_plate}</td>
-                <td>R$ {parseFloat(vehicle.daily_price).toFixed(2)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="admin-products-grid">
+        {vehicles.map((vehicle) => (
+          <article key={vehicle.id} className="admin-product-card">
+            <ProductPhotoCarousel
+              type="vehicle"
+              name={vehicle.name}
+              brand={vehicle.brand}
+              model={vehicle.model}
+              imageUrls={vehicle.image_urls}
+            />
+
+            <div className="admin-product-body">
+              <div className="admin-product-heading">
+                <h2>{vehicle.name}</h2>
+                <span className="admin-product-price">R$ {parseFloat(vehicle.daily_price).toFixed(2)}/dia</span>
+              </div>
+
+              <div className="admin-product-meta">
+                <p><strong>Marca:</strong> {vehicle.brand}</p>
+                <p><strong>Modelo:</strong> {vehicle.model}</p>
+                <p><strong>Ano:</strong> {vehicle.year}</p>
+                <p><strong>Cor:</strong> {vehicle.color || 'Não informada'}</p>
+                <p><strong>Placa:</strong> {vehicle.license_plate}</p>
+              </div>
+            </div>
+          </article>
+        ))}
       </div>
     </div>
   );

@@ -1,0 +1,292 @@
+/* Animações */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes blobAnimation {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(50px, 50px) scale(1.1);
+    opacity: 0.3;
+  }
+}
+
+@keyframes fadeOutScreen {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Tela de Splash */
+.splash-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #007AFF 0%, #0051BA 50%, #003D7A 100%);
+  color: white;
+  position: relative;
+  overflow: hidden;
+  transition: opacity 0.5s ease-out;
+}
+
+.splash-screen.fade-out {
+  animation: fadeOutScreen 0.5s ease-out forwards;
+}
+
+/* Fundo com blobs animados */
+.splash-background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+.gradient-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.3;
+}
+
+.blob-1 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.5), transparent);
+  top: -100px;
+  left: -100px;
+  animation: blobAnimation 8s infinite;
+}
+
+.blob-2 {
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(255, 193, 7, 0.3), transparent);
+  bottom: -50px;
+  right: -50px;
+  animation: blobAnimation 10s infinite 2s;
+}
+
+.blob-3 {
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(76, 175, 80, 0.2), transparent);
+  top: 50%;
+  right: -100px;
+  animation: blobAnimation 12s infinite 4s;
+}
+
+/* Conteúdo Principal */
+.splash-content {
+  text-align: center;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  animation: slideInUp 0.8s ease-out;
+}
+
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: fadeInScale 1s ease-out;
+}
+
+.logo-icon {
+  font-size: 6rem;
+  animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
+}
+
+.splash-logo {
+  font-size: 4rem;
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: -1px;
+  text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  animation: fadeInScale 1s ease-out 0.2s both;
+}
+
+.splash-subtitle {
+  font-size: 1.3rem;
+  margin: 0;
+  opacity: 0.95;
+  font-weight: 500;
+  letter-spacing: 1px;
+  animation: slideInUp 1s ease-out 0.4s both;
+}
+
+/* Spinner de Carregamento */
+.loading-spinner {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+  animation: slideInUp 1s ease-out 0.6s both;
+}
+
+.spinner-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.8);
+  animation: bounce 1.4s infinite;
+}
+
+.spinner-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.spinner-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.spinner-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Texto de Carregamento */
+.splash-loading-text {
+  font-size: 1rem;
+  margin: 0;
+  opacity: 0.8;
+  letter-spacing: 2px;
+  font-weight: 500;
+  animation: slideInUp 1s ease-out 0.8s both;
+}
+
+/* Footer */
+.splash-footer {
+  position: absolute;
+  bottom: 2rem;
+  z-index: 1;
+  animation: slideInUp 1s ease-out 1s both;
+}
+
+.powered-by {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.7;
+  letter-spacing: 1px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .splash-logo {
+    font-size: 3rem;
+  }
+
+  .splash-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .logo-icon {
+    font-size: 4rem;
+  }
+
+  .splash-content {
+    gap: 1.5rem;
+    padding: 2rem;
+  }
+
+  .gradient-blob {
+    filter: blur(60px);
+  }
+
+  .blob-1 {
+    width: 200px;
+    height: 200px;
+  }
+
+  .blob-2 {
+    width: 150px;
+    height: 150px;
+  }
+
+  .blob-3 {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .splash-logo {
+    font-size: 2.5rem;
+  }
+
+  .splash-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .logo-icon {
+    font-size: 3rem;
+  }
+
+  .splash-loading-text {
+    font-size: 0.9rem;
+  }
+
+  .splash-content {
+    gap: 1.2rem;
+    padding: 1rem;
+  }
+}

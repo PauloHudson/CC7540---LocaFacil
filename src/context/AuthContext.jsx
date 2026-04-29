@@ -79,6 +79,30 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  useEffect(() => {
+    const refreshProfile = async () => {
+      const savedToken = localStorage.getItem('authToken');
+      if (!savedToken) {
+        return;
+      }
+
+      try {
+        const response = await authService.getProfile();
+        const profile = response.data;
+
+        setUser((currentUser) => ({
+          ...(currentUser || {}),
+          ...profile,
+        }));
+        localStorage.setItem('user', JSON.stringify(profile));
+      } catch (err) {
+        console.error('Erro ao atualizar perfil autenticado:', err);
+      }
+    };
+
+    refreshProfile();
+  }, []);
+
   const value = {
     user,
     token,

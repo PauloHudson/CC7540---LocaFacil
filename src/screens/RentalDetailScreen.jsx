@@ -39,17 +39,53 @@ const RentalDetailScreen = () => {
     loadInsurance();
   }, [rentalType]);
 
+  // Calcular preços dinâmicos
+  const calculatePrices = () => {
+    if (!startDate || !endDate) {
+      return { days: 0, itemTotal: 0, insuranceTotal: 0, grandTotal: 0 };
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+
+    if (days <= 0) {
+      return { days: 0, itemTotal: 0, insuranceTotal: 0, grandTotal: 0 };
+    }
+
+    const itemDailyPrice = Number(item?.daily_price || 0);
+    const itemTotal = itemDailyPrice * days;
+
+    let insuranceTotal = 0;
+    if (insuranceId) {
+      const selected = insuranceOptions.find((opt) => String(opt.id) === insuranceId);
+      const insuranceDailyPrice = Number(selected?.daily_price || 0);
+      insuranceTotal = insuranceDailyPrice * days;
+    }
+
+    const grandTotal = itemTotal + insuranceTotal;
+
+    return { days, itemTotal, insuranceTotal, grandTotal };
+  };
+
+  const { days, itemTotal, insuranceTotal, grandTotal } = calculatePrices();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
     if (!startDate || !endDate) {
-      setError('Selecione datas');
+      setError('⚠️ Selecione as datas');
       return;
     }
 
     if (new Date(endDate) <= new Date(startDate)) {
-      setError('Data final > inicial');
+      setError('A data final deve ser depois da data inicial');
+      return;
+    }
+
+    if (days <= 0) {
+      setError('Selecione datas válidas');
       return;
     }
 
@@ -57,7 +93,7 @@ const RentalDetailScreen = () => {
       setLoading(true);
       
       if (!item?.id) {
-        setError('Item nao selecionado');
+        setError('Item não selecionado');
         setLoading(false);
         return;
       }
@@ -83,14 +119,29 @@ const RentalDetailScreen = () => {
       }
 
       await rentalService.create(payload);
-      navigate('/payment-confirmation');
+      
+      // Preparar dados para a tela de pagamento
+      const rentalData = {
+        itemName: item?.name || 'Item de Aluguel',
+        days: days,
+        itemPrice: itemTotal,
+        insurancePrice: insuranceTotal,
+        totalPrice: grandTotal,
+      };
+
+      // Navegar para tela de pagamento
+      navigate('/payment', { state: { rentalData } });
     } catch (err) {
-      setError('Erro na locacao');
+      setError('Erro na locação. Tente novamente.');
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
+
+  const selectedInsurance = insuranceId 
+    ? insuranceOptions.find((opt) => String(opt.id) === insuranceId) 
+    : null;
 
   return (
     <div className="rental-container">
@@ -133,7 +184,7 @@ const RentalDetailScreen = () => {
 
           {rentalType === 'vehicle' && (
             <div className="form-group">
-              <label>Seguro</label>
+              <label>Seguro (Opcional)</label>
               <select
                 value={insuranceId}
                 onChange={(e) => setInsuranceId(e.target.value)}
@@ -147,16 +198,37 @@ const RentalDetailScreen = () => {
                   </option>
                 ))}
               </select>
-              {insuranceId && (
+              {selectedInsurance && (
                 <p className="insurance-note">
-                  {insuranceOptions.find((opt) => String(opt.id) === insuranceId)?.description}
+                  ✓ {selectedInsurance.description}
                 </p>
               )}
             </div>
           )}
 
-          <button type="submit" disabled={loading} className="submit-button">
-            {loading ? 'Processando...' : 'Continuar para Pagamento'}
+          {/* Resumo de Custos */}
+          {days > 0 && (
+            <div className="price-summary">
+              <h3>Resumo de Custos</h3>
+              <div className="summary-row">
+                <span>Item: R$ {Number(item?.daily_price || 0).toFixed(2)} × {days} dia(s)</span>
+                <span className="summary-value">R$ {itemTotal.toFixed(2)}</span>
+              </div>
+              {insuranceTotal > 0 && (
+                <div className="summary-row">
+                  <span>Seguro: R$ {Number(selectedInsurance?.daily_price || 0).toFixed(2)} × {days} dia(s)</span>
+                  <span className="summary-value">R$ {insuranceTotal.toFixed(2)}</span>
+                </div>
+              )}
+              <div className="summary-row total">
+                <span>Total a Pagar</span>
+                <span className="total-amount">R$ {grandTotal.toFixed(2)}</span>
+              </div>
+            </div>
+          )}
+
+          <button type="submit" disabled={loading || days === 0} className="submit-button">
+            {loading ? 'Processando...' : days === 0 ? 'Selecione as datas' : 'Continuar para Pagamento'}
           </button>
         </form>
       </div>

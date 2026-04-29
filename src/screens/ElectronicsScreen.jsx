@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { electronicsService } from '../services/api';
+import ProductPhotoCarousel from '../components/ProductPhotoCarousel';
 import './ListingScreens.css';
 
 const ElectronicsScreen = () => {
@@ -51,6 +52,16 @@ const ElectronicsScreen = () => {
       <div className="listing-grid">
         {electronics.map(item => (
           <div key={item.id} className="listing-card">
+            <div className="listing-card-media">
+              <ProductPhotoCarousel
+                type="electronic"
+                name={item.name}
+                brand={item.brand}
+                model={item.model}
+                imageUrls={item.image_urls}
+              />
+            </div>
+
             <div className="card-header">
               <h2 className="card-title">{item.name}</h2>
               <span className="price">R$ {parseFloat(item.daily_price).toFixed(2)}/dia</span>

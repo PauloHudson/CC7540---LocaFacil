@@ -69,9 +69,13 @@ body.menu-open {
 }
 
 .nav-header,
-.nav-divider,
-.nav-footer {
+.nav-divider {
   display: none;
+}
+
+.nav-footer {
+  display: flex;
+  align-items: center;
 }
 
 .nav-links {
@@ -120,10 +124,30 @@ body.menu-open {
   font-size: 1rem;
   transition: background-color 0.2s;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .nav-button:hover {
   background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Desktop - mostrar apenas ícone */
+@media (min-width: 769px) {
+  .nav-button span {
+    display: none;
+  }
+
+  .nav-button {
+    padding: 0.5rem;
+    border: none;
+    background-color: transparent;
+  }
+
+  .nav-button:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
 }
 
 .main-content {

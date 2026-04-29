@@ -10,6 +10,7 @@ const RegisterScreen = () => {
     name: '',
     email: '',
     password: '',
+    confirmPassword: '',
     phone: '',
     cpf: '',
   });
@@ -20,19 +21,67 @@ const RegisterScreen = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Validações
+  const isValidEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const isValidCPF = (cpf) => {
+    const cleanCPF = cpf.replace(/\D/g, '');
+    return cleanCPF.length === 11;
+  };
+
+  const isValidPhone = (phone) => {
+    const cleanPhone = phone.replace(/\D/g, '');
+    return cleanPhone.length >= 10;
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setFormError('');
 
-    const { name, email, password, phone, cpf } = formData;
+    const { name, email, password, confirmPassword, phone, cpf } = formData;
 
-    if (!name || !email || !password || !phone || !cpf) {
-      setFormError('Preencha tudo');
+    // Validações básicas
+    if (!name || !email || !password || !confirmPassword || !phone || !cpf) {
+      setFormError('Preencha todos os campos');
       return;
     }
 
+    // Validar nome
+    if (name.length < 3) {
+      setFormError('Nome deve ter pelo menos 3 caracteres');
+      return;
+    }
+
+    // Validar email
+    if (!isValidEmail(email)) {
+      setFormError('Email inválido. Use um formato válido (ex: seu@email.com)');
+      return;
+    }
+
+    // Validar CPF
+    if (!isValidCPF(cpf)) {
+      setFormError('CPF inválido. Digite 11 números');
+      return;
+    }
+
+    // Validar telefone
+    if (!isValidPhone(phone)) {
+      setFormError('Telefone inválido. Use formato com DDD (ex: 11999999999)');
+      return;
+    }
+
+    // Validar senha
     if (password.length < 6) {
-      setFormError('Senha min 6');
+      setFormError('Senha deve ter no mínimo 6 caracteres');
+      return;
+    }
+
+    // Validar confirmação de senha
+    if (password !== confirmPassword) {
+      setFormError('Senhas não conferem. Verifique!');
       return;
     }
 
@@ -40,7 +89,15 @@ const RegisterScreen = () => {
       await register(name, email, password, phone, cpf);
       navigate('/vehicles');
     } catch (err) {
-      setFormError(error || 'Falha no cadastro');
+      // Tratamento de erros específicos
+      if (error?.includes('existe') || error?.includes('já') || error?.includes('cadastrado')) {
+        setFormError('Email já está cadastrado. Use outro email ou faça login.');
+      } else if (error?.includes('inválido')) {
+        setFormError('Dados inválidos. Verifique e tente novamente.');
+      } else {
+        setFormError(error || 'Falha no cadastro. Tente novamente mais tarde.');
+      }
+      console.error('Erro de registro:', err.response?.data);
     }
   };
 
@@ -81,8 +138,20 @@ const RegisterScreen = () => {
             <input
               type="password"
               name="password"
-              placeholder="Senha"
+              placeholder="Senha (mín. 6 caracteres)"
               value={formData.password}
+              onChange={handleChange}
+              disabled={loading}
+              className="form-input"
+            />
+          </div>
+
+          <div className="form-group">
+            <input
+              type="password"
+              name="confirmPassword"
+              placeholder="Confirmar senha"
+              value={formData.confirmPassword}
               onChange={handleChange}
               disabled={loading}
               className="form-input"
@@ -93,7 +162,7 @@ const RegisterScreen = () => {
             <input
               type="tel"
               name="phone"
-              placeholder="Telefone"
+              placeholder="Telefone (DDD + número)"
               value={formData.phone}
               onChange={handleChange}
               disabled={loading}
@@ -105,7 +174,7 @@ const RegisterScreen = () => {
             <input
               type="text"
               name="cpf"
-              placeholder="CPF"
+              placeholder="CPF (11 números)"
               value={formData.cpf}
               onChange={handleChange}
               disabled={loading}

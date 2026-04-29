@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { electronicsService } from '../services/api';
+import ProductPhotoCarousel from '../components/ProductPhotoCarousel';
+import PLACEHOLDER_DATA_URI from '../utils/placeholder';
 import './AdminScreens.css';
 
 const AdminElectronicsScreen = () => {
@@ -11,6 +13,7 @@ const AdminElectronicsScreen = () => {
     model: '',
     daily_price: '',
     stock: 1,
+    image_urls: '',
   });
   const [showForm, setShowForm] = useState(false);
 
@@ -33,13 +36,19 @@ const AdminElectronicsScreen = () => {
   const handleAddItem = async (e) => {
     e.preventDefault();
     try {
-      await electronicsService.create(newItem);
+      const payload = {
+        ...newItem,
+        image_urls: parseImageUrls(newItem.image_urls),
+      };
+      console.log('[AdminElectronicsScreen] Sending payload:', payload);
+      await electronicsService.create(payload);
       setNewItem({
         name: '',
         brand: '',
         model: '',
         daily_price: '',
         stock: 1,
+        image_urls: '',
       });
       setShowForm(false);
       loadElectronics();
@@ -47,6 +56,18 @@ const AdminElectronicsScreen = () => {
       console.error('Erro ao adicionar:', err);
     }
   };
+
+  const parseImageUrls = (imageUrls) => {
+    if (!imageUrls) return null;
+    const result = String(imageUrls)
+      .split(/[,\n]/)
+      .map((u) => u.trim())
+      .filter(Boolean);
+    console.log('[parseImageUrls Electronics] Input:', imageUrls, '| Output:', result);
+    return result.length > 0 ? result : null;
+  };
+
+  const previewImages = parseImageUrls(newItem.image_urls) || [];
 
   if (loading) {
     return <div className="admin-container"><div className="loading">Carregando...</div></div>;
@@ -107,6 +128,30 @@ const AdminElectronicsScreen = () => {
                 required
               />
             </div>
+
+            <div className="form-group">
+              <label>Fotos do eletrônico (URLs separadas por vírgula ou uma por linha)</label>
+              <textarea
+                value={newItem.image_urls}
+                onChange={(e) => setNewItem({ ...newItem, image_urls: e.target.value })}
+                className="form-textarea"
+                placeholder="https://...\nhttps://..."
+                rows="3"
+              />
+              {previewImages.length > 0 && (
+                <div className="image-preview-grid">
+                  {previewImages.map((src, idx) => (
+                    <div key={src + idx} className="image-preview-item">
+                      <img
+                        src={src}
+                        alt={`Preview ${idx + 1}`}
+                        onError={(e) => { e.currentTarget.src = PLACEHOLDER_DATA_URI; }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
 
@@ -115,27 +160,30 @@ const AdminElectronicsScreen = () => {
         </form>
       )}
 
-      <div className="admin-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Marca</th>
-              <th>Modelo</th>
-              <th>Preço/dia</th>
-            </tr>
-          </thead>
-          <tbody>
-            {electronics.map(item => (
-              <tr key={item.id}>
-                <td>{item.name}</td>
-                <td>{item.brand}</td>
-                <td>{item.model}</td>
-                <td>R$ {parseFloat(item.daily_price).toFixed(2)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="admin-products-grid">
+        {electronics.map((item) => (
+          <article key={item.id} className="admin-product-card">
+            <ProductPhotoCarousel
+              type="electronic"
+              name={item.name}
+              brand={item.brand}
+              model={item.model}
+              imageUrls={item.image_urls}
+            />
+
+            <div className="admin-product-body">
+              <div className="admin-product-heading">
+                <h2>{item.name}</h2>
+                <span className="admin-product-price">R$ {parseFloat(item.daily_price).toFixed(2)}/dia</span>
+              </div>
+
+              <div className="admin-product-meta">
+                <p><strong>Marca:</strong> {item.brand}</p>
+                <p><strong>Modelo:</strong> {item.model || 'Não informado'}</p>
+              </div>
+            </div>
+          </article>
+        ))}
       </div>
     </div>
   );

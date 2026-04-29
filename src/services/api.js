@@ -1,6 +1,14 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://cc-7540-loca-facil-api-main.vercel.app/api';
+const LOCAL_API_URL = 'http://localhost:5000/api';
+const REMOTE_API_URL = 'https://cc-7540-loca-facil-api-main.vercel.app/api';
+
+const API_URL = import.meta.env.VITE_API_URL || (
+  typeof window !== 'undefined' &&
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? LOCAL_API_URL
+    : REMOTE_API_URL
+);
 
 const api = axios.create({
   baseURL: API_URL,

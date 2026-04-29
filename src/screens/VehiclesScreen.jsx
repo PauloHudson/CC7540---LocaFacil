@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { vehicleService } from '../services/api';
+import ProductPhotoCarousel from '../components/ProductPhotoCarousel';
 import './ListingScreens.css';
 
 const VehiclesScreen = () => {
@@ -51,6 +52,16 @@ const VehiclesScreen = () => {
       <div className="listing-grid">
         {vehicles.map(vehicle => (
           <div key={vehicle.id} className="listing-card">
+            <div className="listing-card-media">
+              <ProductPhotoCarousel
+                type="vehicle"
+                name={vehicle.name}
+                brand={vehicle.brand}
+                model={vehicle.model}
+                imageUrls={vehicle.image_urls}
+              />
+            </div>
+
             <div className="card-header">
               <h2 className="card-title">{vehicle.name}</h2>
               <span className="price">R$ {parseFloat(vehicle.daily_price).toFixed(2)}/dia</span>

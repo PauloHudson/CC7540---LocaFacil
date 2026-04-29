@@ -15,15 +15,31 @@ const LoginScreen = () => {
     setFormError('');
 
     if (!email || !password) {
-      setFormError('Preencha email e senha');
+      setFormError('⚠️ Preencha email e senha');
+      return;
+    }
+
+    if (!email.includes('@')) {
+      setFormError('⚠️ Email inválido');
       return;
     }
 
     try {
-      await login(email, password);
-      navigate('/vehicles');
+      const response = await login(email, password);
+      const isAdmin = response?.user?.is_admin;
+      navigate(isAdmin ? '/admin/vehicles' : '/vehicles');
     } catch (err) {
-      setFormError(error || 'Falha no login');
+      // Melhor tratamento de erros específicos
+      if (error?.includes('não encontrado')) {
+        setFormError('Email não cadastrado. Verifique ou crie uma conta.');
+      } else if (error?.includes('senha')) {
+        setFormError('Senha incorreta. Tente novamente.');
+      } else if (error?.includes('não encontrada')) {
+        setFormError('Email ou senha inválidos.');
+      } else {
+        setFormError(error || 'Falha no login. Tente novamente.');
+      }
+      console.error('Erro de login:', err.response?.data);
     }
   };
 

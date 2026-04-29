@@ -1,0 +1,88 @@
+@keyframes spinnerRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spinnerPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Spinner Base */
+.spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner-circle {
+  border: 3px solid rgba(0, 122, 255, 0.1);
+  border-top: 3px solid #007AFF;
+  border-radius: 50%;
+  animation: spinnerRotate 1s linear infinite;
+}
+
+/* Tamanhos */
+.spinner-small .spinner-circle {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+  border-top-width: 2px;
+}
+
+.spinner-medium .spinner-circle {
+  width: 40px;
+  height: 40px;
+  border-width: 3px;
+  border-top-width: 3px;
+}
+
+.spinner-large .spinner-circle {
+  width: 60px;
+  height: 60px;
+  border-width: 4px;
+  border-top-width: 4px;
+}
+
+/* Cores */
+.spinner-primary .spinner-circle {
+  border-color: rgba(0, 122, 255, 0.1);
+  border-top-color: #007AFF;
+}
+
+.spinner-success .spinner-circle {
+  border-color: rgba(76, 175, 80, 0.1);
+  border-top-color: #4CAF50;
+}
+
+.spinner-error .spinner-circle {
+  border-color: rgba(244, 67, 54, 0.1);
+  border-top-color: #f44336;
+}
+
+.spinner-warning .spinner-circle {
+  border-color: rgba(255, 193, 7, 0.1);
+  border-top-color: #ffc107;
+}
+
+.spinner-white .spinner-circle {
+  border-color: rgba(255, 255, 255, 0.1);
+  border-top-color: #ffffff;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .spinner-large .spinner-circle {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+  }
+}
