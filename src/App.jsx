@@ -56,7 +56,7 @@ const Routes_App = () => {
   const { isSignedIn, loading } = useContext(AuthContext);
 
   if (loading) {
-    return <LoadingScreen message="Carregando aplicação..." />;
+    return <LoadingScreen message="Carregando LocaFacil..." />;
   }
 
   return (
