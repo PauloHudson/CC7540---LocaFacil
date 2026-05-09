@@ -16,6 +16,24 @@ const RegisterScreen = () => {
   });
   const [formError, setFormError] = useState('');
 
+  const mapRegisterError = (rawError) => {
+    const normalizedError = String(rawError || '').toLowerCase();
+
+    if (normalizedError.includes('cpf') && normalizedError.includes('cadastrado')) {
+      return 'CPF já cadastrado. Tente outro CPF ou faça login.';
+    }
+
+    if (normalizedError.includes('email') && normalizedError.includes('cadastrado')) {
+      return 'Email já está cadastrado. Use outro email ou faça login.';
+    }
+
+    if (normalizedError.includes('invalido') || normalizedError.includes('inválido')) {
+      return 'Dados inválidos. Verifique e tente novamente.';
+    }
+
+    return rawError || 'Falha no cadastro. Tente novamente mais tarde.';
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -89,17 +107,13 @@ const RegisterScreen = () => {
       await register(name, email, password, phone, cpf);
       navigate('/vehicles');
     } catch (err) {
-      // Tratamento de erros específicos
-      if (error?.includes('existe') || error?.includes('já') || error?.includes('cadastrado')) {
-        setFormError('Email já está cadastrado. Use outro email ou faça login.');
-      } else if (error?.includes('inválido')) {
-        setFormError('Dados inválidos. Verifique e tente novamente.');
-      } else {
-        setFormError(error || 'Falha no cadastro. Tente novamente mais tarde.');
-      }
+      const apiError = err.response?.data?.error || error || 'Falha no cadastro. Tente novamente mais tarde.';
+      setFormError(mapRegisterError(apiError));
       console.error('Erro de registro:', err.response?.data);
     }
   };
+
+  const displayedError = formError || (error ? mapRegisterError(error) : '');
 
   return (
     <div className="auth-container">
@@ -108,7 +122,7 @@ const RegisterScreen = () => {
         <h2 className="auth-subtitle">Crie sua conta</h2>
 
         <form onSubmit={handleRegister} className="auth-form">
-          {formError && <div className="form-error">{formError}</div>}
+          {displayedError && <div className="form-error">{displayedError}</div>}
 
           <div className="form-group">
             <input
